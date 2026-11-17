@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <title>100,000 Recipe Finder</title>
 
 <style>
@@ -22,6 +23,7 @@
   --modal-info:#fff8ef;
   --button:#ff704d;
   --button-hover:#e85836;
+  --shadow:0 5px 15px rgba(90,50,20,.12);
 }
 
 body.dark-mode{
@@ -38,6 +40,7 @@ body.dark-mode{
   --modal-info:#33302d;
   --button:#e96849;
   --button-hover:#ff805d;
+  --shadow:0 5px 18px rgba(0,0,0,.3);
 }
 
 body{
@@ -47,6 +50,8 @@ body{
   color:var(--text);
   transition:background .25s,color .25s;
 }
+
+body.modal-open{overflow:hidden}
 
 header{
   background:linear-gradient(135deg,#ff704d,#ffb347);
@@ -72,17 +77,37 @@ header p{margin:0;font-size:17px}
 
 .theme-button:hover{background:rgba(255,255,255,.3)}
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:3px solid #ff704d;
+  outline-offset:3px;
+}
+
 .controls{
   max-width:1250px;
   margin:24px auto 10px;
   padding:0 16px;
   display:grid;
-  grid-template-columns:2fr repeat(4,1fr);
+  grid-template-columns:2fr repeat(3,1fr);
   gap:12px;
+}
+
+.control-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.control-group label{
+  font-size:13px;
+  font-weight:bold;
+  color:var(--muted);
 }
 
 input,select{
   width:100%;
+  min-width:0;
   padding:14px;
   border:2px solid var(--input-border);
   border-radius:10px;
@@ -91,17 +116,12 @@ input,select{
   color:var(--text);
 }
 
-input:focus,select:focus{
-  outline:3px solid rgba(255,112,77,.25);
-  border-color:#ff704d;
-}
-
 .recipe-count{
   max-width:1250px;
   margin:12px auto 20px;
   padding:0 16px;
   font-weight:bold;
-  color:#c16b45;
+  color:var(--badge-text);
 }
 
 #recipeGrid{
@@ -117,7 +137,7 @@ input:focus,select:focus{
   background:var(--card);
   border-radius:16px;
   overflow:hidden;
-  box-shadow:0 5px 15px rgba(90,50,20,.12);
+  box-shadow:var(--shadow);
   border:1px solid var(--border);
   display:flex;
   flex-direction:column;
@@ -231,6 +251,7 @@ input:focus,select:focus{
   border-radius:18px;
   padding:28px;
   position:relative;
+  box-shadow:0 10px 40px rgba(0,0,0,.3);
 }
 
 .close-button{
@@ -275,7 +296,7 @@ input:focus,select:focus{
   line-height:1.8;
 }
 
-@media(max-width:1100px){
+@media(max-width:900px){
   .controls{grid-template-columns:repeat(2,1fr)}
 }
 
@@ -293,80 +314,70 @@ input:focus,select:focus{
 <header>
   <h1>🍴 Recipe Finder</h1>
   <p>Explore exactly 100,000 recipes</p>
-  <button class="theme-button" id="themeToggle">🌙 Dark Mode</button>
+  <button type="button" class="theme-button" id="themeToggle"
+    aria-pressed="false">🌙 Dark Mode</button>
 </header>
 
-<section class="controls">
-  <input id="searchInput" type="text"
-    placeholder="Search spaghetti, tacos, ingredients, or recipes...">
+<section class="controls" aria-label="Recipe search and filters">
 
-  <select id="categoryFilter">
-    <option value="All">All Categories</option>
-    <option value="Breakfast">Breakfast</option>
-    <option value="Lunch">Lunch</option>
-    <option value="Dinner">Dinner</option>
-    <option value="Snack">Snack</option>
-    <option value="Dessert">Dessert</option>
-    <option value="Drink">Drink</option>
-    <option value="Vegetarian">Vegetarian</option>
-    <option value="International">International</option>
-  </select>
+  <div class="control-group">
+    <label for="searchInput">Search Recipes</label>
+    <input id="searchInput" type="search"
+      placeholder="Search recipes or ingredients..."
+      autocomplete="off">
+  </div>
 
-  <select id="typeFilter">
-    <option value="All">All Types</option>
-    <option value="Spaghetti">Spaghetti</option>
-    <option value="Pasta">Pasta</option>
-    <option value="Noodles">Noodles</option>
-    <option value="Tacos">Tacos</option>
-    <option value="Rice">Rice</option>
-    <option value="Soup">Soup</option>
-    <option value="Salad">Salad</option>
-    <option value="Pizza">Pizza</option>
-    <option value="Sandwiches">Sandwiches</option>
-    <option value="Burritos">Burritos</option>
-    <option value="Wraps">Wraps</option>
-    <option value="Breakfast">Breakfast Foods</option>
-    <option value="Desserts">Desserts</option>
-    <option value="Drinks">Drinks</option>
-    <option value="Snacks">Snacks</option>
-    <option value="Curry">Curry</option>
-    <option value="Potatoes">Potatoes</option>
-    <option value="Cakes">Cakes</option>
-    <option value="Stir Fry">Stir Fry</option>
-    <option value="Burgers">Burgers</option>
-    <option value="Seafood">Seafood</option>
-    <option value="Chicken">Chicken</option>
-    <option value="Beef">Beef</option>
-    <option value="Cookies">Cookies</option>
-    <option value="Smoothies">Smoothies</option>
-  </select>
+  <div class="control-group">
+    <label for="categoryFilter">Category</label>
+    <select id="categoryFilter">
+      <option value="All">All Categories</option>
+    </select>
+  </div>
 
-  <select id="difficultyFilter">
-    <option value="All">All Difficulties</option>
-    <option value="Easy">Easy</option>
-    <option value="Medium">Medium</option>
-    <option value="Hard">Hard</option>
-  </select>
+  <div class="control-group">
+    <label for="difficultyFilter">Difficulty</label>
+    <select id="difficultyFilter">
+      <option value="All">All Difficulties</option>
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
+    </select>
+  </div>
 
-  <select id="sortSelect">
-    <option value="name">Sort by Name</option>
-    <option value="time">Sort by Cooking Time</option>
-    <option value="difficulty">Sort by Difficulty</option>
-  </select>
+  <div class="control-group">
+    <label for="sortSelect">Sort Recipes</label>
+    <select id="sortSelect">
+      <option value="name">Sort by Name</option>
+      <option value="time">Sort by Cooking Time</option>
+      <option value="difficulty">Sort by Difficulty</option>
+    </select>
+  </div>
+
 </section>
 
-<div class="recipe-count" id="recipeCount"></div>
-<main id="recipeGrid"></main>
+<div class="recipe-count" id="recipeCount"
+  aria-live="polite" aria-atomic="true"></div>
 
-<button id="loadMoreButton">Load More Recipes</button>
+<main id="recipeGrid" aria-label="Recipe results"></main>
 
-<div id="noResults">
-  No recipes were found. Try another search or type.
+<button type="button" id="loadMoreButton">Load More Recipes</button>
+
+<div id="noResults" role="status" aria-live="polite" hidden>
+  No recipes were found. Try another search or category.
 </div>
 
-<div class="modal-background" id="modalBackground">
-  <div class="modal">
-    <button class="close-button" id="closeButton">&times;</button>
+<div class="modal-background" id="modalBackground"
+  aria-hidden="true">
+
+  <div class="modal" id="recipeModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    tabindex="-1">
+
+    <button type="button" class="close-button" id="closeButton"
+      aria-label="Close recipe details">&times;</button>
+
     <div id="modalContent"></div>
   </div>
 </div>
@@ -507,7 +518,9 @@ const baseRecipes = [
 ["Beef Stew","Beef"],["Beef Skillet","Beef"],["Roast Beef","Beef"],["Beef Fajitas","Beef"],
 ["Chocolate Cookies","Cookies"],["Oatmeal Cookies","Cookies"],["Sugar Cookies","Cookies"],["Peanut Butter Cookies","Cookies"],
 ["Banana Smoothie","Smoothies"],["Mango Smoothie","Smoothies"],["Green Smoothie","Smoothies"],["Peach Smoothie","Smoothies"]
-].map(function(item){return {name:item[0],type:item[1]};});
+].map(function(item){
+  return {name:item[0],type:item[1]};
+});
 
 const flavorTwists = [
 {name:"Classic",ingredient:"a pinch of salt",step:"Taste and add salt if needed."},
@@ -522,8 +535,16 @@ const flavorTwists = [
 {name:"Fresh Garden",ingredient:"1/2 cup chopped fresh vegetables",step:"Add the fresh vegetables just before serving."}
 ];
 
-const versionFamilies=["Family Style","Quick","Light","Protein Plus","Garden","Weekend","Budget","Lunchbox","Party","Holiday"];
-const versionQualities=["Home","Fresh","Simple","Deluxe","Healthy","Golden","Classic","Special","Favorite","Everyday"];
+const versionFamilies=[
+  "Family Style","Quick","Light","Protein Plus","Garden",
+  "Weekend","Budget","Lunchbox","Party","Holiday"
+];
+
+const versionQualities=[
+  "Home","Fresh","Simple","Deluxe","Healthy",
+  "Golden","Classic","Special","Favorite","Everyday"
+];
+
 const recipeVersions=[];
 
 versionFamilies.forEach(function(family,familyIndex){
@@ -542,6 +563,11 @@ const recipes=[];
 baseRecipes.forEach(function(base,baseIndex){
   const info=recipeTypeInfo[base.type];
 
+  if(!info){
+    console.error("Missing recipe information:",base.type);
+    return;
+  }
+
   flavorTwists.forEach(function(twist,twistIndex){
     recipeVersions.forEach(function(version,versionIndex){
       const id=baseIndex*1000+twistIndex*100+versionIndex+1;
@@ -555,8 +581,14 @@ baseRecipes.forEach(function(base,baseIndex){
         time:info.time+twistIndex+version.extraTime,
         servings:info.servings,
         difficulty:info.difficulty,
-        ingredients:info.ingredients.concat([twist.ingredient,version.ingredient]),
-        steps:info.steps.concat([twist.step,version.step])
+        ingredients:info.ingredients.concat([
+          twist.ingredient,
+          version.ingredient
+        ]),
+        steps:info.steps.concat([
+          twist.step,
+          version.step
+        ])
       });
     });
   });
@@ -564,36 +596,113 @@ baseRecipes.forEach(function(base,baseIndex){
 
 console.log("Total recipes:",recipes.length);
 
+/* PAGE ELEMENTS */
+
 const recipeGrid=document.getElementById("recipeGrid");
 const searchInput=document.getElementById("searchInput");
 const categoryFilter=document.getElementById("categoryFilter");
-const typeFilter=document.getElementById("typeFilter");
 const difficultyFilter=document.getElementById("difficultyFilter");
 const sortSelect=document.getElementById("sortSelect");
 const recipeCount=document.getElementById("recipeCount");
 const loadMoreButton=document.getElementById("loadMoreButton");
 const noResults=document.getElementById("noResults");
 const modalBackground=document.getElementById("modalBackground");
+const recipeModal=document.getElementById("recipeModal");
 const modalContent=document.getElementById("modalContent");
 const closeButton=document.getElementById("closeButton");
 const themeToggle=document.getElementById("themeToggle");
 
 let visibleRecipeLimit=120;
 let currentFilteredRecipes=[];
+let previousFocusedElement=null;
+
+/* COMBINED CATEGORY DROPDOWN */
+
+/*
+  One option can represent either an original category
+  or an original recipe type.
+
+  Breakfast, Dessert, Drinks, and Snacks are combined
+  with their matching category names so they do not
+  appear twice.
+*/
+
+const categoryAliases={
+  "Breakfast":["Breakfast"],
+  "Dessert":["Desserts"],
+  "Drink":["Drinks"],
+  "Snack":["Snacks"]
+};
+
+const categoryOptions=[
+  {label:"Breakfast",values:["Breakfast"]},
+  {label:"Lunch",values:["Lunch"]},
+  {label:"Dinner",values:["Dinner"]},
+  {label:"Snack",values:["Snack","Snacks"]},
+  {label:"Dessert",values:["Dessert","Desserts"]},
+  {label:"Drink",values:["Drink","Drinks"]},
+  {label:"Vegetarian",values:["Vegetarian"]},
+  {label:"International",values:["International"]},
+  {label:"Spaghetti",values:["Spaghetti"]},
+  {label:"Pasta",values:["Pasta"]},
+  {label:"Noodles",values:["Noodles"]},
+  {label:"Tacos",values:["Tacos"]},
+  {label:"Rice",values:["Rice"]},
+  {label:"Soup",values:["Soup"]},
+  {label:"Salad",values:["Salad"]},
+  {label:"Pizza",values:["Pizza"]},
+  {label:"Sandwiches",values:["Sandwiches"]},
+  {label:"Burritos",values:["Burritos"]},
+  {label:"Wraps",values:["Wraps"]},
+  {label:"Curry",values:["Curry"]},
+  {label:"Potatoes",values:["Potatoes"]},
+  {label:"Cakes",values:["Cakes"]},
+  {label:"Stir Fry",values:["Stir Fry"]},
+  {label:"Burgers",values:["Burgers"]},
+  {label:"Seafood",values:["Seafood"]},
+  {label:"Chicken",values:["Chicken"]},
+  {label:"Beef",values:["Beef"]},
+  {label:"Cookies",values:["Cookies"]},
+  {label:"Smoothies",values:["Smoothies"]}
+];
+
+categoryOptions.forEach(function(option){
+  const element=document.createElement("option");
+  element.value=option.label;
+  element.textContent=option.label;
+  categoryFilter.appendChild(element);
+});
 
 /* LIGHT AND DARK MODE */
 
 function applyTheme(theme){
-  document.body.classList.toggle("dark-mode",theme==="dark");
-  themeToggle.textContent=theme==="dark"?"☀️ Light Mode":"🌙 Dark Mode";
-  localStorage.setItem("recipeFinderTheme",theme);
+  const isDark=theme==="dark";
+
+  document.body.classList.toggle("dark-mode",isDark);
+  themeToggle.textContent=isDark?"☀️ Light Mode":"🌙 Dark Mode";
+  themeToggle.setAttribute("aria-pressed",String(isDark));
+
+  try{
+    localStorage.setItem("recipeFinderTheme",theme);
+  }catch(error){
+    console.warn("Theme preference could not be saved.",error);
+  }
 }
 
-const savedTheme=localStorage.getItem("recipeFinderTheme")||"light";
+let savedTheme="light";
+
+try{
+  savedTheme=localStorage.getItem("recipeFinderTheme")||"light";
+}catch(error){
+  console.warn("Saved theme could not be loaded.",error);
+}
+
 applyTheme(savedTheme);
 
 themeToggle.addEventListener("click",function(){
-  const newTheme=document.body.classList.contains("dark-mode")?"light":"dark";
+  const newTheme=document.body.classList.contains("dark-mode")
+    ?"light":"dark";
+
   applyTheme(newTheme);
 });
 
@@ -608,42 +717,72 @@ function escapeHTML(value){
     .replace(/'/g,"&#039;");
 }
 
+/* CATEGORY FILTER MATCHING */
+
+function matchesCombinedCategory(recipe,selected){
+  if(selected==="All")return true;
+
+  const option=categoryOptions.find(function(item){
+    return item.label===selected;
+  });
+
+  if(!option)return true;
+
+  return option.values.includes(recipe.category)||
+    option.values.includes(recipe.type);
+}
+
 /* FILTER AND SORT RECIPES */
 
 function getFilteredRecipes(){
   const searchText=searchInput.value.trim().toLowerCase();
   const selectedCategory=categoryFilter.value;
-  const selectedType=typeFilter.value;
   const selectedDifficulty=difficultyFilter.value;
   const selectedSort=sortSelect.value;
+
+  const searchWords=searchText.split(/\s+/).filter(Boolean);
 
   let filtered=recipes.filter(function(recipe){
     const searchableText=[
       recipe.name,
       recipe.type,
       recipe.category,
+      recipe.difficulty,
       recipe.ingredients.join(" "),
       recipe.steps.join(" ")
     ].join(" ").toLowerCase();
 
-    const matchesSearch=searchableText.includes(searchText);
-    const matchesCategory=selectedCategory==="All"||recipe.category===selectedCategory;
-    const matchesType=selectedType==="All"||recipe.type===selectedType;
-    const matchesDifficulty=selectedDifficulty==="All"||recipe.difficulty===selectedDifficulty;
+    const matchesSearch=searchWords.every(function(word){
+      return searchableText.includes(word);
+    });
 
-    return matchesSearch&&matchesCategory&&matchesType&&matchesDifficulty;
+    const matchesCategory=matchesCombinedCategory(
+      recipe,selectedCategory
+    );
+
+    const matchesDifficulty=
+      selectedDifficulty==="All"||
+      recipe.difficulty===selectedDifficulty;
+
+    return matchesSearch&&matchesCategory&&matchesDifficulty;
   });
 
-  filtered.sort(function(a,b){
-    if(selectedSort==="time")return a.time-b.time;
+  if(selectedSort==="time"){
+    filtered.sort(function(a,b){
+      return a.time-b.time||a.name.localeCompare(b.name);
+    });
+  }else if(selectedSort==="difficulty"){
+    const order={Easy:1,Medium:2,Hard:3};
 
-    if(selectedSort==="difficulty"){
-      const order={Easy:1,Medium:2,Hard:3};
-      return order[a.difficulty]-order[b.difficulty];
-    }
-
-    return a.name.localeCompare(b.name);
-  });
+    filtered.sort(function(a,b){
+      return order[a.difficulty]-order[b.difficulty]||
+        a.name.localeCompare(b.name);
+    });
+  }else{
+    filtered.sort(function(a,b){
+      return a.name.localeCompare(b.name);
+    });
+  }
 
   return filtered;
 }
@@ -652,77 +791,95 @@ function getFilteredRecipes(){
 
 function displayRecipes(){
   currentFilteredRecipes=getFilteredRecipes();
+
+  const fragment=document.createDocumentFragment();
+  const recipesToDisplay=currentFilteredRecipes.slice(
+    0,visibleRecipeLimit
+  );
+
   recipeGrid.innerHTML="";
-
-  recipeCount.textContent=
-    "Showing "+Math.min(visibleRecipeLimit,currentFilteredRecipes.length)+
-    " of "+currentFilteredRecipes.length+
-    " matching recipes out of "+recipes.length+" total recipes";
-
-  if(currentFilteredRecipes.length===0){
-    noResults.style.display="block";
-    loadMoreButton.style.display="none";
-    return;
-  }
-
-  noResults.style.display="none";
-
-  const recipesToDisplay=currentFilteredRecipes.slice(0,visibleRecipeLimit);
 
   recipesToDisplay.forEach(function(recipe){
     const card=document.createElement("article");
     card.className="recipe-card";
 
     card.innerHTML=`
-      <div class="recipe-image">${escapeHTML(recipe.emoji)}</div>
+      <div class="recipe-image" aria-hidden="true">
+        ${escapeHTML(recipe.emoji)}
+      </div>
+
       <div class="recipe-content">
+
         <div class="badges">
           <span class="badge">${escapeHTML(recipe.category)}</span>
           <span class="badge">${escapeHTML(recipe.type)}</span>
           <span class="badge">${escapeHTML(recipe.difficulty)}</span>
         </div>
+
         <h2>${escapeHTML(recipe.name)}</h2>
+
         <div class="details">
           ⏱ ${escapeHTML(recipe.time)} minutes<br>
           👥 Serves ${escapeHTML(recipe.servings)}<br>
           ⭐ ${escapeHTML(recipe.difficulty)}<br>
           🔢 Recipe #${escapeHTML(recipe.id)}
         </div>
-        <button class="view-button" data-id="${escapeHTML(recipe.id)}">
+
+        <button type="button" class="view-button"
+          data-id="${recipe.id}"
+          aria-label="View ${escapeHTML(recipe.name)} recipe">
           View Recipe
         </button>
+
       </div>
     `;
 
-    recipeGrid.appendChild(card);
+    fragment.appendChild(card);
   });
+
+  recipeGrid.appendChild(fragment);
+
+  const shown=recipesToDisplay.length;
+  const total=currentFilteredRecipes.length;
+
+  recipeCount.textContent=
+    "Showing "+shown.toLocaleString()+
+    " of "+total.toLocaleString()+
+    " matching recipes out of "+
+    recipes.length.toLocaleString()+" total recipes";
+
+  noResults.hidden=total!==0;
 
   loadMoreButton.style.display=
-    visibleRecipeLimit<currentFilteredRecipes.length?"block":"none";
+    shown<total?"block":"none";
 
-  document.querySelectorAll(".view-button").forEach(function(button){
-    button.addEventListener("click",function(){
-      openRecipe(Number(button.dataset.id));
-    });
-  });
+  loadMoreButton.disabled=shown>=total;
 }
 
 /* OPEN RECIPE DETAILS */
 
 function openRecipe(recipeId){
-  const recipe=recipes.find(function(item){return item.id===recipeId;});
+  const recipe=recipes.find(function(item){
+    return item.id===recipeId;
+  });
+
   if(!recipe)return;
+
+  previousFocusedElement=document.activeElement;
 
   const ingredientList=recipe.ingredients.map(function(ingredient){
     return "<li>"+escapeHTML(ingredient)+"</li>";
   }).join("");
 
   const stepList=recipe.steps.map(function(step,index){
-    return "<li><strong>Step "+(index+1)+":</strong> "+escapeHTML(step)+"</li>";
+    return "<li><strong>Step "+(index+1)+":</strong> "+
+      escapeHTML(step)+"</li>";
   }).join("");
 
   modalContent.innerHTML=`
-    <h2>${escapeHTML(recipe.emoji)} ${escapeHTML(recipe.name)}</h2>
+    <h2 id="modalTitle">
+      ${escapeHTML(recipe.emoji)} ${escapeHTML(recipe.name)}
+    </h2>
 
     <div class="modal-info">
       <strong>Recipe number:</strong> ${escapeHTML(recipe.id)}<br>
@@ -741,11 +898,65 @@ function openRecipe(recipeId){
   `;
 
   modalBackground.style.display="flex";
+  modalBackground.setAttribute("aria-hidden","false");
+  document.body.classList.add("modal-open");
+
+  closeButton.focus();
 }
 
+/* CLOSE RECIPE DETAILS */
+
 function closeRecipe(){
+  if(modalBackground.style.display!=="flex")return;
+
   modalBackground.style.display="none";
+  modalBackground.setAttribute("aria-hidden","true");
+  document.body.classList.remove("modal-open");
+
+  if(previousFocusedElement&&
+     typeof previousFocusedElement.focus==="function"){
+    previousFocusedElement.focus();
+  }
 }
+
+/* KEYBOARD ACCESSIBILITY FOR MODAL */
+
+function handleModalKeyboard(event){
+  if(modalBackground.style.display!=="flex")return;
+
+  if(event.key==="Escape"){
+    event.preventDefault();
+    closeRecipe();
+    return;
+  }
+
+  if(event.key==="Tab"){
+    const focusable=recipeModal.querySelectorAll(
+      'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
+    );
+
+    const items=Array.from(focusable);
+
+    if(items.length===0){
+      event.preventDefault();
+      recipeModal.focus();
+      return;
+    }
+
+    const first=items[0];
+    const last=items[items.length-1];
+
+    if(event.shiftKey&&document.activeElement===first){
+      event.preventDefault();
+      last.focus();
+    }else if(!event.shiftKey&&document.activeElement===last){
+      event.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+/* RESET PAGINATION AFTER FILTER CHANGES */
 
 function resetVisibleLimit(){
   visibleRecipeLimit=120;
@@ -756,7 +967,6 @@ function resetVisibleLimit(){
 
 searchInput.addEventListener("input",resetVisibleLimit);
 categoryFilter.addEventListener("change",resetVisibleLimit);
-typeFilter.addEventListener("change",resetVisibleLimit);
 difficultyFilter.addEventListener("change",resetVisibleLimit);
 sortSelect.addEventListener("change",resetVisibleLimit);
 
@@ -768,16 +978,27 @@ loadMoreButton.addEventListener("click",function(){
 closeButton.addEventListener("click",closeRecipe);
 
 modalBackground.addEventListener("click",function(event){
-  if(event.target===modalBackground)closeRecipe();
+  if(event.target===modalBackground){
+    closeRecipe();
+  }
 });
 
-document.addEventListener("keydown",function(event){
-  if(event.key==="Escape")closeRecipe();
+document.addEventListener("keydown",handleModalKeyboard);
+
+/* EVENT DELEGATION FOR RECIPE BUTTONS */
+
+recipeGrid.addEventListener("click",function(event){
+  const button=event.target.closest(".view-button");
+
+  if(!button)return;
+
+  openRecipe(Number(button.dataset.id));
 });
 
 /* START WEBSITE */
 
 displayRecipes();
+
 </script>
 
 </body>
