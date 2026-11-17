@@ -1,1473 +1,784 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>100,000 Recipe Finder</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100,000 Recipe Finder</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fff8ef
-;
-      color: #30251f
-;
-    }
+:root{
+  --page:#fff8ef;
+  --text:#30251f;
+  --card:#fff;
+  --border:#ffe0ca;
+  --muted:#71584c;
+  --heading:#733b29;
+  --badge:#fff0df;
+  --badge-text:#a44f27;
+  --input:#fff;
+  --input-border:#ffd1b8;
+  --modal-info:#fff8ef;
+  --button:#ff704d;
+  --button-hover:#e85836;
+}
 
-    header {
-      background: linear-gradient(135deg, #ff704d
-, #ffb347
-);
-      color: white;
-      text-align: center;
-      padding: 32px 16px;
-    }
+body.dark-mode{
+  --page:#171717;
+  --text:#f2e9e2;
+  --card:#262626;
+  --border:#494039;
+  --muted:#c2b4aa;
+  --heading:#ffb18d;
+  --badge:#44342b;
+  --badge-text:#ffd0ad;
+  --input:#292929;
+  --input-border:#635044;
+  --modal-info:#33302d;
+  --button:#e96849;
+  --button-hover:#ff805d;
+}
 
-    header h1 {
-      margin: 0 0 8px;
-      font-size: 38px;
-    }
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--page);
+  color:var(--text);
+  transition:background .25s,color .25s;
+}
 
-    header p {
-      margin: 0;
-      font-size: 17px;
-    }
+header{
+  background:linear-gradient(135deg,#ff704d,#ffb347);
+  color:white;
+  text-align:center;
+  padding:32px 16px;
+}
 
-    .controls {
-      max-width: 1250px;
-      margin: 24px auto 10px;
-      padding: 0 16px;
-      display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr);
-      gap: 12px;
-    }
+header h1{margin:0 0 8px;font-size:38px}
+header p{margin:0;font-size:17px}
 
-    input,
-    select {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid #ffd1b8
-;
-      border-radius: 10px;
-      font-size: 16px;
-      background: white;
-      color: #30251f
-;
-    }
+.theme-button{
+  margin-top:18px;
+  padding:11px 18px;
+  border:2px solid white;
+  border-radius:25px;
+  background:rgba(255,255,255,.18);
+  color:white;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    input:focus,
-    select:focus {
-      outline: 3px solid rgba(255, 112, 77, 0.25);
-      border-color: #ff704d
-;
-    }
+.theme-button:hover{background:rgba(255,255,255,.3)}
 
-    .recipe-count {
-      max-width: 1250px;
-      margin: 12px auto 20px;
-      padding: 0 16px;
-      font-weight: bold;
-      color: #8c4a32
-;
-    }
+.controls{
+  max-width:1250px;
+  margin:24px auto 10px;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:2fr repeat(4,1fr);
+  gap:12px;
+}
 
-    #recipeGrid {
-      max-width: 1250px;
-      margin: auto;
-      padding: 0 16px 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
+input,select{
+  width:100%;
+  padding:14px;
+  border:2px solid var(--input-border);
+  border-radius:10px;
+  font-size:16px;
+  background:var(--input);
+  color:var(--text);
+}
 
-    .recipe-card {
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(90, 50, 20, 0.12);
-      border: 1px solid #ffe0ca
-;
-      display: flex;
-      flex-direction: column;
-    }
+input:focus,select:focus{
+  outline:3px solid rgba(255,112,77,.25);
+  border-color:#ff704d;
+}
 
-    .recipe-image {
-      height: 145px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 65px;
-      background: #ffe5d1
-;
-    }
+.recipe-count{
+  max-width:1250px;
+  margin:12px auto 20px;
+  padding:0 16px;
+  font-weight:bold;
+  color:#c16b45;
+}
 
-    .recipe-content {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-    }
+#recipeGrid{
+  max-width:1250px;
+  margin:auto;
+  padding:0 16px 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
 
-    .recipe-content h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
-      color: #733b29
-;
-      line-height: 1.3;
-    }
+.recipe-card{
+  background:var(--card);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 5px 15px rgba(90,50,20,.12);
+  border:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  transition:background .25s,border-color .25s;
+}
 
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
+.recipe-image{
+  height:145px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:65px;
+  background:var(--badge);
+}
 
-    .badge {
-      display: inline-block;
-      width: fit-content;
-      padding: 5px 9px;
-      background: #fff0df
-;
-      color: #a44f27
-;
-      border-radius: 20px;
-      font-size: 12px;
-    }
+.recipe-content{
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  flex-grow:1;
+}
 
-    .details {
-      color: #71584c
-;
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 15px;
-    }
+.recipe-content h2{
+  margin:0 0 12px;
+  font-size:20px;
+  color:var(--heading);
+  line-height:1.3;
+}
 
-    .view-button {
-      margin-top: auto;
-      padding: 12px;
-      border: none;
-      border-radius: 9px;
-      background: #ff704d
-;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:12px;
+}
 
-    .view-button:hover {
-      background: #e85836
-;
-    }
+.badge{
+  display:inline-block;
+  width:fit-content;
+  padding:5px 9px;
+  background:var(--badge);
+  color:var(--badge-text);
+  border-radius:20px;
+  font-size:12px;
+}
 
-    #loadMoreButton {
-      display: none;
-      margin: 10px auto 40px;
-      padding: 13px 28px;
-      border: none;
-      border-radius: 10px;
-      background: #733b29
-;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.details{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+  margin-bottom:15px;
+}
 
-    #loadMoreButton:hover {
-      background: #4f281d
-;
-    }
+.view-button{
+  margin-top:auto;
+  padding:12px;
+  border:none;
+  border-radius:9px;
+  background:var(--button);
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    #noResults {
-      display: none;
-      max-width: 600px;
-      margin: 50px auto;
-      text-align: center;
-      padding: 30px;
-      font-size: 20px;
-      color: #805442
-;
-    }
+.view-button:hover{background:var(--button-hover)}
 
-    .modal-background {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(35, 20, 10, 0.65);
-      justify-content: center;
-      align-items: center;
-      padding: 18px;
-      z-index: 10;
-    }
+#loadMoreButton{
+  display:none;
+  margin:10px auto 40px;
+  padding:13px 28px;
+  border:none;
+  border-radius:10px;
+  background:#733b29;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    .modal {
-      background: white;
-      max-width: 700px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      border-radius: 18px;
-      padding: 28px;
-      position: relative;
-    }
+#loadMoreButton:hover{background:#4f281d}
 
-    .close-button {
-      position: absolute;
-      right: 18px;
-      top: 14px;
-      border: none;
-      background: #ffe8dc
-;
-      color: #8d3f25
-;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-size: 22px;
-      cursor: pointer;
-    }
+#noResults{
+  display:none;
+  max-width:600px;
+  margin:50px auto;
+  text-align:center;
+  padding:30px;
+  font-size:20px;
+  color:var(--muted);
+}
 
-    .close-button:hover {
-      background: #ffd1b8
-;
-    }
+.modal-background{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+  z-index:10;
+}
 
-    .modal h2 {
-      color: #733b29
-;
-      margin-top: 0;
-      padding-right: 40px;
-      line-height: 1.3;
-    }
+.modal{
+  background:var(--card);
+  color:var(--text);
+  max-width:700px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  border-radius:18px;
+  padding:28px;
+  position:relative;
+}
 
-    .modal h3 {
-      color: #a44f27
-;
-      border-bottom: 2px solid #ffe0ca
-;
-      padding-bottom: 7px;
-      margin-top: 25px;
-    }
+.close-button{
+  position:absolute;
+  right:18px;
+  top:14px;
+  border:none;
+  background:var(--badge);
+  color:var(--badge-text);
+  border-radius:50%;
+  width:35px;
+  height:35px;
+  font-size:22px;
+  cursor:pointer;
+}
 
-    .modal li {
-      margin: 9px 0;
-      line-height: 1.5;
-    }
+.close-button:hover{opacity:.75}
 
-    .modal-info {
-      background: #fff8ef
-;
-      border-radius: 10px;
-      padding: 14px;
-      line-height: 1.8;
-    }
+.modal h2{
+  color:var(--heading);
+  margin-top:0;
+  padding-right:40px;
+  line-height:1.3;
+}
 
-    @media (max-width: 950px) {
-      .controls {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+.modal h3{
+  color:var(--badge-text);
+  border-bottom:2px solid var(--border);
+  padding-bottom:7px;
+  margin-top:25px;
+}
 
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 30px;
-      }
+.modal li{
+  margin:9px 0;
+  line-height:1.5;
+}
 
-      .controls {
-        grid-template-columns: 1fr;
-      }
+.modal-info{
+  background:var(--modal-info);
+  border-radius:10px;
+  padding:14px;
+  line-height:1.8;
+}
 
-      #recipeGrid {
-        grid-template-columns: 1fr;
-      }
+@media(max-width:1100px){
+  .controls{grid-template-columns:repeat(2,1fr)}
+}
 
-      .modal {
-        padding: 22px;
-      }
-    }
-  </style>
+@media(max-width:600px){
+  header h1{font-size:30px}
+  .controls{grid-template-columns:1fr}
+  #recipeGrid{grid-template-columns:1fr}
+  .modal{padding:22px}
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <h1>🍴 Recipe Finder</h1>
-    <p>Explore exactly 100,000 recipes</p>
-  </header>
+<header>
+  <h1>🍴 Recipe Finder</h1>
+  <p>Explore exactly 100,000 recipes</p>
+  <button class="theme-button" id="themeToggle">🌙 Dark Mode</button>
+</header>
 
-  <section class="controls">
-    <input
-      id="searchInput"
-      type="text"
-      placeholder="Search spaghetti, tacos, ingredients, or recipes..."
-    >
+<section class="controls">
+  <input id="searchInput" type="text"
+    placeholder="Search spaghetti, tacos, ingredients, or recipes...">
 
-    <select id="categoryFilter">
-      <option value="All">All Categories</option>
-      <option value="Breakfast">Breakfast</option>
-      <option value="Lunch">Lunch</option>
-      <option value="Dinner">Dinner</option>
-      <option value="Snack">Snack</option>
-      <option value="Dessert">Dessert</option>
-      <option value="Drink">Drink</option>
-      <option value="Vegetarian">Vegetarian</option>
-      <option value="International">International</option>
-    </select>
+  <select id="categoryFilter">
+    <option value="All">All Categories</option>
+    <option value="Breakfast">Breakfast</option>
+    <option value="Lunch">Lunch</option>
+    <option value="Dinner">Dinner</option>
+    <option value="Snack">Snack</option>
+    <option value="Dessert">Dessert</option>
+    <option value="Drink">Drink</option>
+    <option value="Vegetarian">Vegetarian</option>
+    <option value="International">International</option>
+  </select>
 
-    <select id="typeFilter">
-      <option value="All">All Types</option>
-      <option value="Spaghetti">Spaghetti</option>
-      <option value="Pasta">Pasta</option>
-      <option value="Noodles">Noodles</option>
-      <option value="Tacos">Tacos</option>
-      <option value="Rice">Rice</option>
-      <option value="Soup">Soup</option>
-      <option value="Salad">Salad</option>
-      <option value="Pizza">Pizza</option>
-      <option value="Sandwiches">Sandwiches</option>
-      <option value="Burritos">Burritos</option>
-      <option value="Wraps">Wraps</option>
-      <option value="Breakfast">Breakfast Foods</option>
-      <option value="Desserts">Desserts</option>
-      <option value="Drinks">Drinks</option>
-      <option value="Snacks">Snacks</option>
-      <option value="Curry">Curry</option>
-      <option value="Potatoes">Potatoes</option>
-      <option value="Cakes">Cakes</option>
-      <option value="Stir Fry">Stir Fry</option>
-      <option value="Burgers">Burgers</option>
-      <option value="Seafood">Seafood</option>
-      <option value="Chicken">Chicken</option>
-      <option value="Beef">Beef</option>
-      <option value="Cookies">Cookies</option>
-      <option value="Smoothies">Smoothies</option>
-    </select>
+  <select id="typeFilter">
+    <option value="All">All Types</option>
+    <option value="Spaghetti">Spaghetti</option>
+    <option value="Pasta">Pasta</option>
+    <option value="Noodles">Noodles</option>
+    <option value="Tacos">Tacos</option>
+    <option value="Rice">Rice</option>
+    <option value="Soup">Soup</option>
+    <option value="Salad">Salad</option>
+    <option value="Pizza">Pizza</option>
+    <option value="Sandwiches">Sandwiches</option>
+    <option value="Burritos">Burritos</option>
+    <option value="Wraps">Wraps</option>
+    <option value="Breakfast">Breakfast Foods</option>
+    <option value="Desserts">Desserts</option>
+    <option value="Drinks">Drinks</option>
+    <option value="Snacks">Snacks</option>
+    <option value="Curry">Curry</option>
+    <option value="Potatoes">Potatoes</option>
+    <option value="Cakes">Cakes</option>
+    <option value="Stir Fry">Stir Fry</option>
+    <option value="Burgers">Burgers</option>
+    <option value="Seafood">Seafood</option>
+    <option value="Chicken">Chicken</option>
+    <option value="Beef">Beef</option>
+    <option value="Cookies">Cookies</option>
+    <option value="Smoothies">Smoothies</option>
+  </select>
 
-    <select id="sortSelect">
-      <option value="name">Sort by Name</option>
-      <option value="time">Sort by Cooking Time</option>
-      <option value="difficulty">Sort by Difficulty</option>
-    </select>
-  </section>
+  <select id="difficultyFilter">
+    <option value="All">All Difficulties</option>
+    <option value="Easy">Easy</option>
+    <option value="Medium">Medium</option>
+    <option value="Hard">Hard</option>
+  </select>
 
-  <div class="recipe-count" id="recipeCount"></div>
+  <select id="sortSelect">
+    <option value="name">Sort by Name</option>
+    <option value="time">Sort by Cooking Time</option>
+    <option value="difficulty">Sort by Difficulty</option>
+  </select>
+</section>
 
-  <main id="recipeGrid"></main>
+<div class="recipe-count" id="recipeCount"></div>
+<main id="recipeGrid"></main>
 
-  <button id="loadMoreButton">
-    Load More Recipes
-  </button>
+<button id="loadMoreButton">Load More Recipes</button>
 
-  <div id="noResults">
-    No recipes were found. Try another search or type.
+<div id="noResults">
+  No recipes were found. Try another search or type.
+</div>
+
+<div class="modal-background" id="modalBackground">
+  <div class="modal">
+    <button class="close-button" id="closeButton">&times;</button>
+    <div id="modalContent"></div>
   </div>
+</div>
 
-  <div class="modal-background" id="modalBackground">
-    <div class="modal">
-      <button class="close-button" id="closeButton">&times;</button>
-      <div id="modalContent"></div>
-    </div>
-  </div>
+<script>
+/*
+  100 base recipes
+  x 10 flavor twists
+  x 100 recipe versions
+  = 100,000 recipes
+*/
 
-  <script>
-    /*
-      TOTAL RECIPE COUNT:
+const recipeTypeInfo = {
+  Spaghetti:{category:"Dinner",emoji:"🍝",time:25,servings:4,difficulty:"Easy",
+    ingredients:["12 ounces spaghetti","3 garlic cloves","2 tablespoons olive oil"],
+    steps:["Boil the spaghetti in salted water until tender.","Cook the garlic in olive oil for one minute.","Drain the spaghetti and mix everything together."]},
 
-      100 base recipes
-      x 10 flavor twists
-      x 100 recipe versions
-      = 100,000 recipes
-    */
+  Pasta:{category:"Dinner",emoji:"🍝",time:30,servings:4,difficulty:"Easy",
+    ingredients:["12 ounces pasta","1 cup tomato sauce","1/2 cup grated cheese"],
+    steps:["Boil the pasta until tender.","Warm the sauce in a pan.","Mix the pasta with the sauce and cheese."]},
 
-    const recipeTypeInfo = {
-      Spaghetti: {
-        category: "Dinner",
-        emoji: "🍝",
-        time: 25,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "12 ounces spaghetti",
-          "3 garlic cloves",
-          "2 tablespoons olive oil"
-        ],
-        steps: [
-          "Boil the spaghetti in salted water until tender.",
-          "Cook the garlic in olive oil for one minute.",
-          "Drain the spaghetti and mix everything together."
-        ]
-      },
+  Noodles:{category:"Dinner",emoji:"🍜",time:30,servings:4,difficulty:"Medium",
+    ingredients:["8 ounces noodles","2 cups vegetables","2 tablespoons soy sauce"],
+    steps:["Cook the noodles according to the package directions.","Cook the vegetables in a hot pan.","Add the noodles and sauce, then stir together."]},
 
-      Pasta: {
-        category: "Dinner",
-        emoji: "🍝",
-        time: 30,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "12 ounces pasta",
-          "1 cup tomato sauce",
-          "1/2 cup grated cheese"
-        ],
-        steps: [
-          "Boil the pasta until tender.",
-          "Warm the sauce in a pan.",
-          "Mix the pasta with the sauce and cheese."
-        ]
-      },
+  Tacos:{category:"International",emoji:"🌮",time:30,servings:4,difficulty:"Medium",
+    ingredients:["8 taco shells","1 pound taco filling","1 tomato"],
+    steps:["Cook the taco filling until fully done.","Warm the taco shells.","Fill the shells with the filling and toppings."]},
 
-      Noodles: {
-        category: "Dinner",
-        emoji: "🍜",
-        time: 30,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "8 ounces noodles",
-          "2 cups vegetables",
-          "2 tablespoons soy sauce"
-        ],
-        steps: [
-          "Cook the noodles according to the package directions.",
-          "Cook the vegetables in a hot pan.",
-          "Add the noodles and sauce, then stir together."
-        ]
-      },
+  Rice:{category:"Dinner",emoji:"🍚",time:30,servings:4,difficulty:"Easy",
+    ingredients:["2 cups cooked rice","1 cup mixed vegetables","1 tablespoon cooking oil"],
+    steps:["Prepare the rice.","Cook the vegetables in a hot pan.","Add the rice and stir until warm."]},
 
-      Tacos: {
-        category: "International",
-        emoji: "🌮",
-        time: 30,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "8 taco shells",
-          "1 pound taco filling",
-          "1 tomato"
-        ],
-        steps: [
-          "Cook the taco filling until fully done.",
-          "Warm the taco shells.",
-          "Fill the shells with the filling and toppings."
-        ]
-      },
+  Soup:{category:"Lunch",emoji:"🍲",time:40,servings:6,difficulty:"Easy",
+    ingredients:["4 cups broth","3 cups chopped vegetables","1 teaspoon herbs"],
+    steps:["Add the broth and vegetables to a large pot.","Bring the mixture to a boil.","Simmer until all the vegetables are tender."]},
 
-      Rice: {
-        category: "Dinner",
-        emoji: "🍚",
-        time: 30,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "2 cups cooked rice",
-          "1 cup mixed vegetables",
-          "1 tablespoon cooking oil"
-        ],
-        steps: [
-          "Prepare the rice.",
-          "Cook the vegetables in a hot pan.",
-          "Add the rice and stir until warm."
-        ]
-      },
+  Salad:{category:"Vegetarian",emoji:"🥗",time:15,servings:4,difficulty:"Easy",
+    ingredients:["4 cups salad greens","2 tomatoes","1 cucumber"],
+    steps:["Wash and chop the vegetables.","Place the ingredients in a large bowl.","Add dressing and mix before serving."]},
 
-      Soup: {
-        category: "Lunch",
-        emoji: "🍲",
-        time: 40,
-        servings: 6,
-        difficulty: "Easy",
-        ingredients: [
-          "4 cups broth",
-          "3 cups chopped vegetables",
-          "1 teaspoon herbs"
-        ],
-        steps: [
-          "Add the broth and vegetables to a large pot.",
-          "Bring the mixture to a boil.",
-          "Simmer until all the vegetables are tender."
-        ]
-      },
+  Pizza:{category:"Dinner",emoji:"🍕",time:35,servings:4,difficulty:"Medium",
+    ingredients:["1 pizza crust","1/2 cup tomato sauce","1 cup mozzarella cheese"],
+    steps:["Spread the sauce over the crust.","Add the cheese and toppings.","Bake until the crust is golden and the cheese melts."]},
 
-      Salad: {
-        category: "Vegetarian",
-        emoji: "🥗",
-        time: 15,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "4 cups salad greens",
-          "2 tomatoes",
-          "1 cucumber"
-        ],
-        steps: [
-          "Wash and chop the vegetables.",
-          "Place the ingredients in a large bowl.",
-          "Add dressing and mix before serving."
-        ]
-      },
+  Sandwiches:{category:"Lunch",emoji:"🥪",time:10,servings:2,difficulty:"Easy",
+    ingredients:["4 slices bread","4 slices cheese","1 cup sandwich filling"],
+    steps:["Place the filling between the bread slices.","Add cheese and vegetables.","Serve cold or toast until golden."]},
 
-      Pizza: {
-        category: "Dinner",
-        emoji: "🍕",
-        time: 35,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "1 pizza crust",
-          "1/2 cup tomato sauce",
-          "1 cup mozzarella cheese"
-        ],
-        steps: [
-          "Spread the sauce over the crust.",
-          "Add the cheese and toppings.",
-          "Bake until the crust is golden and the cheese melts."
-        ]
-      },
+  Burritos:{category:"International",emoji:"🌯",time:25,servings:4,difficulty:"Easy",
+    ingredients:["4 large tortillas","2 cups cooked beans","1 cup cooked rice"],
+    steps:["Warm the tortillas.","Add the beans, rice, and toppings.","Fold the tortillas tightly and serve."]},
 
-      Sandwiches: {
-        category: "Lunch",
-        emoji: "🥪",
-        time: 10,
-        servings: 2,
-        difficulty: "Easy",
-        ingredients: [
-          "4 slices bread",
-          "4 slices cheese",
-          "1 cup sandwich filling"
-        ],
-        steps: [
-          "Place the filling between the bread slices.",
-          "Add cheese and vegetables.",
-          "Serve cold or toast until golden."
-        ]
-      },
+  Wraps:{category:"Lunch",emoji:"🌯",time:12,servings:2,difficulty:"Easy",
+    ingredients:["2 tortillas","1 cup lettuce","1 cup wrap filling"],
+    steps:["Place the filling in the center of each tortilla.","Add the lettuce and toppings.","Roll the tortillas tightly before serving."]},
 
-      Burritos: {
-        category: "International",
-        emoji: "🌯",
-        time: 25,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "4 large tortillas",
-          "2 cups cooked beans",
-          "1 cup cooked rice"
-        ],
-        steps: [
-          "Warm the tortillas.",
-          "Add the beans, rice, and toppings.",
-          "Fold the tortillas tightly and serve."
-        ]
-      },
+  Breakfast:{category:"Breakfast",emoji:"🥞",time:20,servings:4,difficulty:"Easy",
+    ingredients:["2 eggs","1 cup flour","1 cup milk"],
+    steps:["Mix the ingredients in a bowl.","Heat a pan over medium heat.","Cook until golden and serve warm."]},
 
-      Wraps: {
-        category: "Lunch",
-        emoji: "🌯",
-        time: 12,
-        servings: 2,
-        difficulty: "Easy",
-        ingredients: [
-          "2 tortillas",
-          "1 cup lettuce",
-          "1 cup wrap filling"
-        ],
-        steps: [
-          "Place the filling in the center of each tortilla.",
-          "Add the lettuce and toppings.",
-          "Roll the tortillas tightly before serving."
-        ]
-      },
+  Desserts:{category:"Dessert",emoji:"🍮",time:25,servings:6,difficulty:"Easy",
+    ingredients:["2 cups fruit","1 cup yogurt","2 tablespoons honey"],
+    steps:["Prepare the fruit.","Mix the ingredients together.","Chill before serving."]},
 
-      Breakfast: {
-        category: "Breakfast",
-        emoji: "🥞",
-        time: 20,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "2 eggs",
-          "1 cup flour",
-          "1 cup milk"
-        ],
-        steps: [
-          "Mix the ingredients in a bowl.",
-          "Heat a pan over medium heat.",
-          "Cook until golden and serve warm."
-        ]
-      },
+  Drinks:{category:"Drink",emoji:"🥤",time:8,servings:4,difficulty:"Easy",
+    ingredients:["2 cups fruit","3 cups water","2 tablespoons honey"],
+    steps:["Prepare the fruit.","Blend or mix all ingredients.","Chill and serve."]},
 
-      Desserts: {
-        category: "Dessert",
-        emoji: "🍮",
-        time: 25,
-        servings: 6,
-        difficulty: "Easy",
-        ingredients: [
-          "2 cups fruit",
-          "1 cup yogurt",
-          "2 tablespoons honey"
-        ],
-        steps: [
-          "Prepare the fruit.",
-          "Mix the ingredients together.",
-          "Chill before serving."
-        ]
-      },
+  Snacks:{category:"Snack",emoji:"🥜",time:15,servings:4,difficulty:"Easy",
+    ingredients:["2 cups snack ingredients","1 tablespoon honey","1/2 teaspoon salt"],
+    steps:["Place the ingredients in a bowl.","Mix everything together.","Serve immediately or chill first."]},
 
-      Drinks: {
-        category: "Drink",
-        emoji: "🥤",
-        time: 8,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "2 cups fruit",
-          "3 cups water",
-          "2 tablespoons honey"
-        ],
-        steps: [
-          "Prepare the fruit.",
-          "Blend or mix all ingredients.",
-          "Chill and serve."
-        ]
-      },
+  Curry:{category:"International",emoji:"🍛",time:45,servings:5,difficulty:"Hard",
+    ingredients:["2 cups vegetables or protein","2 cups tomato sauce","1 tablespoon curry powder"],
+    steps:["Cook the vegetables or protein until tender.","Add the sauce and curry powder.","Simmer until the curry is thick and flavorful."]},
 
-      Snacks: {
-        category: "Snack",
-        emoji: "🥜",
-        time: 15,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "2 cups snack ingredients",
-          "1 tablespoon honey",
-          "1/2 teaspoon salt"
-        ],
-        steps: [
-          "Place the ingredients in a bowl.",
-          "Mix everything together.",
-          "Serve immediately or chill first."
-        ]
-      },
+  Potatoes:{category:"Lunch",emoji:"🥔",time:45,servings:4,difficulty:"Easy",
+    ingredients:["4 potatoes","2 tablespoons olive oil","Salt and pepper"],
+    steps:["Wash and prepare the potatoes.","Season them with oil, salt, and pepper.","Bake or cook until soft and golden."]},
 
-      Curry: {
-        category: "International",
-        emoji: "🍛",
-        time: 45,
-        servings: 5,
-        difficulty: "Medium",
-        ingredients: [
-          "2 cups vegetables or protein",
-          "2 cups tomato sauce",
-          "1 tablespoon curry powder"
-        ],
-        steps: [
-          "Cook the vegetables or protein until tender.",
-          "Add the sauce and curry powder.",
-          "Simmer until the curry is thick and flavorful."
-        ]
-      },
+  Cakes:{category:"Dessert",emoji:"🍰",time:50,servings:8,difficulty:"Hard",
+    ingredients:["2 cups flour","2 eggs","1 cup sugar"],
+    steps:["Mix the flour, eggs, and sugar.","Pour the mixture into a cake pan.","Bake until the center is fully set."]},
 
-      Potatoes: {
-        category: "Lunch",
-        emoji: "🥔",
-        time: 45,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "4 potatoes",
-          "2 tablespoons olive oil",
-          "Salt and pepper"
-        ],
-        steps: [
-          "Wash and prepare the potatoes.",
-          "Season them with oil, salt, and pepper.",
-          "Bake or cook until soft and golden."
-        ]
-      },
+  "Stir Fry":{category:"Vegetarian",emoji:"🥦",time:22,servings:4,difficulty:"Easy",
+    ingredients:["2 cups vegetables","1 tablespoon cooking oil","2 tablespoons soy sauce"],
+    steps:["Chop all the vegetables.","Cook them in a hot pan.","Add the sauce and stir until tender."]},
 
-      Cakes: {
-        category: "Dessert",
-        emoji: "🍰",
-        time: 50,
-        servings: 8,
-        difficulty: "Medium",
-        ingredients: [
-          "2 cups flour",
-          "2 eggs",
-          "1 cup sugar"
-        ],
-        steps: [
-          "Mix the flour, eggs, and sugar.",
-          "Pour the mixture into a cake pan.",
-          "Bake until the center is fully set."
-        ]
-      },
+  Burgers:{category:"Dinner",emoji:"🍔",time:25,servings:4,difficulty:"Medium",
+    ingredients:["4 burger buns","4 burger patties","1 cup burger toppings"],
+    steps:["Cook the patties until fully done.","Toast the burger buns.","Add the toppings and serve."]},
 
-      "Stir Fry": {
-        category: "Vegetarian",
-        emoji: "🥦",
-        time: 22,
-        servings: 4,
-        difficulty: "Easy",
-        ingredients: [
-          "2 cups vegetables",
-          "1 tablespoon cooking oil",
-          "2 tablespoons soy sauce"
-        ],
-        steps: [
-          "Chop all the vegetables.",
-          "Cook them in a hot pan.",
-          "Add the sauce and stir until tender."
-        ]
-      },
+  Seafood:{category:"Dinner",emoji:"🐟",time:30,servings:4,difficulty:"Hard",
+    ingredients:["1 pound seafood","1 lemon","1 tablespoon olive oil"],
+    steps:["Season the seafood with lemon and oil.","Cook until tender and fully done.","Serve warm with your favorite side."]},
 
-      Burgers: {
-        category: "Dinner",
-        emoji: "🍔",
-        time: 25,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "4 burger buns",
-          "4 burger patties",
-          "1 cup burger toppings"
-        ],
-        steps: [
-          "Cook the patties until fully done.",
-          "Toast the burger buns.",
-          "Add the toppings and serve."
-        ]
-      },
+  Chicken:{category:"Dinner",emoji:"🍗",time:35,servings:4,difficulty:"Medium",
+    ingredients:["2 chicken breasts","1 tablespoon olive oil","1 teaspoon herbs"],
+    steps:["Season the chicken.","Cook until no longer pink in the center.","Rest the chicken before serving."]},
 
-      Seafood: {
-        category: "Dinner",
-        emoji: "🐟",
-        time: 30,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "1 pound seafood",
-          "1 lemon",
-          "1 tablespoon olive oil"
-        ],
-        steps: [
-          "Season the seafood with lemon and oil.",
-          "Cook until tender and fully done.",
-          "Serve warm with your favorite side."
-        ]
-      },
+  Beef:{category:"Dinner",emoji:"🥩",time:45,servings:4,difficulty:"Hard",
+    ingredients:["1 pound beef","1 onion","2 cups beef broth"],
+    steps:["Brown the beef in a large pan.","Add the onion and broth.","Cook until the beef is tender."]},
 
-      Chicken: {
-        category: "Dinner",
-        emoji: "🍗",
-        time: 35,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "2 chicken breasts",
-          "1 tablespoon olive oil",
-          "1 teaspoon herbs"
-        ],
-        steps: [
-          "Season the chicken.",
-          "Cook until no longer pink in the center.",
-          "Rest the chicken before serving."
-        ]
-      },
+  Cookies:{category:"Dessert",emoji:"🍪",time:30,servings:24,difficulty:"Easy",
+    ingredients:["1 cup flour","1/2 cup butter","1/2 cup sugar"],
+    steps:["Mix the butter, flour, and sugar.","Shape the mixture into cookies.","Bake until the edges are golden."]},
 
-      Beef: {
-        category: "Dinner",
-        emoji: "🥩",
-        time: 45,
-        servings: 4,
-        difficulty: "Medium",
-        ingredients: [
-          "1 pound beef",
-          "1 onion",
-          "2 cups beef broth"
-        ],
-        steps: [
-          "Brown the beef in a large pan.",
-          "Add the onion and broth.",
-          "Cook until the beef is tender."
-        ]
-      },
+  Smoothies:{category:"Drink",emoji:"🥤",time:5,servings:2,difficulty:"Easy",
+    ingredients:["1 banana","1 cup fruit","1 cup milk"],
+    steps:["Wash and prepare the fruit.","Place everything in a blender.","Blend until smooth and serve."]}
+};
 
-      Cookies: {
-        category: "Dessert",
-        emoji: "🍪",
-        time: 30,
-        servings: 24,
-        difficulty: "Easy",
-        ingredients: [
-          "1 cup flour",
-          "1/2 cup butter",
-          "1/2 cup sugar"
-        ],
-        steps: [
-          "Mix the butter, flour, and sugar.",
-          "Shape the mixture into cookies.",
-          "Bake until the edges are golden."
-        ]
-      },
+const baseRecipes = [
+["Garlic Spaghetti","Spaghetti"],["Tomato Spaghetti","Spaghetti"],["Meatball Spaghetti","Spaghetti"],["Pesto Spaghetti","Spaghetti"],
+["Chicken Pasta","Pasta"],["Alfredo Pasta","Pasta"],["Vegetable Pasta","Pasta"],["Baked Pasta","Pasta"],
+["Chicken Noodles","Noodles"],["Beef Noodles","Noodles"],["Sesame Noodles","Noodles"],["Vegetable Noodles","Noodles"],
+["Beef Tacos","Tacos"],["Chicken Tacos","Tacos"],["Fish Tacos","Tacos"],["Bean Tacos","Tacos"],
+["Chicken Rice Bowl","Rice"],["Vegetable Fried Rice","Rice"],["Coconut Rice","Rice"],["Mushroom Rice","Rice"],
+["Vegetable Soup","Soup"],["Tomato Soup","Soup"],["Chicken Noodle Soup","Soup"],["Lentil Soup","Soup"],
+["Greek Salad","Salad"],["Chicken Salad","Salad"],["Caesar Salad","Salad"],["Pasta Salad","Salad"],
+["Tomato Pizza","Pizza"],["Cheese Pizza","Pizza"],["Vegetable Pizza","Pizza"],["Chicken Pizza","Pizza"],
+["Tuna Sandwich","Sandwiches"],["Grilled Cheese","Sandwiches"],["Chicken Sandwich","Sandwiches"],["Egg Sandwich","Sandwiches"],
+["Bean Burrito","Burritos"],["Chicken Burrito","Burritos"],["Beef Burrito","Burritos"],["Breakfast Burrito","Burritos"],
+["Turkey Wrap","Wraps"],["Veggie Wrap","Wraps"],["Chicken Wrap","Wraps"],["Falafel Wrap","Wraps"],
+["Pancakes","Breakfast"],["French Toast","Breakfast"],["Apple Oatmeal","Breakfast"],["Omelet","Breakfast"],
+["Berry Parfait","Desserts"],["Rice Pudding","Desserts"],["Fruit Trifle","Desserts"],["Chia Pudding","Desserts"],
+["Fruit Smoothie","Drinks"],["Berry Lemonade","Drinks"],["Iced Tea","Drinks"],["Hot Chocolate","Drinks"],
+["Hummus Plate","Snacks"],["Mango Salsa","Snacks"],["Peanut Butter Bites","Snacks"],["Trail Mix","Snacks"],
+["Lentil Curry","Curry"],["Chicken Curry","Curry"],["Vegetable Curry","Curry"],["Chickpea Curry","Curry"],
+["Baked Potatoes","Potatoes"],["Potato Wedges","Potatoes"],["Mashed Potatoes","Potatoes"],["Potato Hash","Potatoes"],
+["Strawberry Cake","Cakes"],["Chocolate Cake","Cakes"],["Carrot Cake","Cakes"],["Lemon Cake","Cakes"],
+["Vegetable Stir Fry","Stir Fry"],["Chicken Stir Fry","Stir Fry"],["Beef Stir Fry","Stir Fry"],["Tofu Stir Fry","Stir Fry"],
+["Beef Burger","Burgers"],["Chicken Burger","Burgers"],["Veggie Burger","Burgers"],["Bean Burger","Burgers"],
+["Salmon Bowl","Seafood"],["Shrimp Skillet","Seafood"],["Tuna Rice Bowl","Seafood"],["Fish Bake","Seafood"],
+["Roast Chicken","Chicken"],["Lemon Chicken","Chicken"],["BBQ Chicken","Chicken"],["Herb Chicken","Chicken"],
+["Beef Stew","Beef"],["Beef Skillet","Beef"],["Roast Beef","Beef"],["Beef Fajitas","Beef"],
+["Chocolate Cookies","Cookies"],["Oatmeal Cookies","Cookies"],["Sugar Cookies","Cookies"],["Peanut Butter Cookies","Cookies"],
+["Banana Smoothie","Smoothies"],["Mango Smoothie","Smoothies"],["Green Smoothie","Smoothies"],["Peach Smoothie","Smoothies"]
+].map(function(item){return {name:item[0],type:item[1]};});
 
-      Smoothies: {
-        category: "Drink",
-        emoji: "🥤",
-        time: 5,
-        servings: 2,
-        difficulty: "Easy",
-        ingredients: [
-          "1 banana",
-          "1 cup fruit",
-          "1 cup milk"
-        ],
-        steps: [
-          "Wash and prepare the fruit.",
-          "Place everything in a blender.",
-          "Blend until smooth and serve."
-        ]
-      }
-    };
+const flavorTwists = [
+{name:"Classic",ingredient:"a pinch of salt",step:"Taste and add salt if needed."},
+{name:"Lemon Herb",ingredient:"1 tablespoon lemon juice and fresh herbs",step:"Finish with lemon juice and fresh herbs."},
+{name:"Spicy",ingredient:"1/2 teaspoon chili flakes",step:"Add chili flakes for a spicy flavor."},
+{name:"Cheesy",ingredient:"1/2 cup extra shredded cheese",step:"Add the extra cheese before serving."},
+{name:"Smoky",ingredient:"1 teaspoon smoked paprika",step:"Stir in smoked paprika for a smoky flavor."},
+{name:"Garlic Herb",ingredient:"2 extra garlic cloves and fresh parsley",step:"Add garlic and parsley near the end."},
+{name:"Honey Glazed",ingredient:"1 tablespoon honey",step:"Drizzle honey over the finished recipe."},
+{name:"Creamy",ingredient:"1/3 cup cooking cream",step:"Stir in the cream until smooth."},
+{name:"Crunchy",ingredient:"1/2 cup toasted breadcrumbs",step:"Add toasted breadcrumbs before serving."},
+{name:"Fresh Garden",ingredient:"1/2 cup chopped fresh vegetables",step:"Add the fresh vegetables just before serving."}
+];
 
-    /*
-      25 recipe types x 4 base recipes each = 100 base recipes.
-    */
+const versionFamilies=["Family Style","Quick","Light","Protein Plus","Garden","Weekend","Budget","Lunchbox","Party","Holiday"];
+const versionQualities=["Home","Fresh","Simple","Deluxe","Healthy","Golden","Classic","Special","Favorite","Everyday"];
+const recipeVersions=[];
 
-    const baseRecipes = [
-      { name: "Garlic Spaghetti", type: "Spaghetti" },
-      { name: "Tomato Spaghetti", type: "Spaghetti" },
-      { name: "Meatball Spaghetti", type: "Spaghetti" },
-      { name: "Pesto Spaghetti", type: "Spaghetti" },
+versionFamilies.forEach(function(family,familyIndex){
+  versionQualities.forEach(function(quality,qualityIndex){
+    recipeVersions.push({
+      name:quality+" "+family,
+      ingredient:"one extra ingredient for the "+quality.toLowerCase()+" "+family.toLowerCase()+" version",
+      step:"Finish and serve the "+quality.toLowerCase()+" "+family.toLowerCase()+" version.",
+      extraTime:familyIndex+qualityIndex
+    });
+  });
+});
 
-      { name: "Chicken Pasta", type: "Pasta" },
-      { name: "Alfredo Pasta", type: "Pasta" },
-      { name: "Vegetable Pasta", type: "Pasta" },
-      { name: "Baked Pasta", type: "Pasta" },
+const recipes=[];
 
-      { name: "Chicken Noodles", type: "Noodles" },
-      { name: "Beef Noodles", type: "Noodles" },
-      { name: "Sesame Noodles", type: "Noodles" },
-      { name: "Vegetable Noodles", type: "Noodles" },
+baseRecipes.forEach(function(base,baseIndex){
+  const info=recipeTypeInfo[base.type];
 
-      { name: "Beef Tacos", type: "Tacos" },
-      { name: "Chicken Tacos", type: "Tacos" },
-      { name: "Fish Tacos", type: "Tacos" },
-      { name: "Bean Tacos", type: "Tacos" },
+  flavorTwists.forEach(function(twist,twistIndex){
+    recipeVersions.forEach(function(version,versionIndex){
+      const id=baseIndex*1000+twistIndex*100+versionIndex+1;
 
-      { name: "Chicken Rice Bowl", type: "Rice" },
-      { name: "Vegetable Fried Rice", type: "Rice" },
-      { name: "Coconut Rice", type: "Rice" },
-      { name: "Mushroom Rice", type: "Rice" },
-
-      { name: "Vegetable Soup", type: "Soup" },
-      { name: "Tomato Soup", type: "Soup" },
-      { name: "Chicken Noodle Soup", type: "Soup" },
-      { name: "Lentil Soup", type: "Soup" },
-
-      { name: "Greek Salad", type: "Salad" },
-      { name: "Chicken Salad", type: "Salad" },
-      { name: "Caesar Salad", type: "Salad" },
-      { name: "Pasta Salad", type: "Salad" },
-
-      { name: "Tomato Pizza", type: "Pizza" },
-      { name: "Cheese Pizza", type: "Pizza" },
-      { name: "Vegetable Pizza", type: "Pizza" },
-      { name: "Chicken Pizza", type: "Pizza" },
-
-      { name: "Tuna Sandwich", type: "Sandwiches" },
-      { name: "Grilled Cheese", type: "Sandwiches" },
-      { name: "Chicken Sandwich", type: "Sandwiches" },
-      { name: "Egg Sandwich", type: "Sandwiches" },
-
-      { name: "Bean Burrito", type: "Burritos" },
-      { name: "Chicken Burrito", type: "Burritos" },
-      { name: "Beef Burrito", type: "Burritos" },
-      { name: "Breakfast Burrito", type: "Burritos" },
-
-      { name: "Turkey Wrap", type: "Wraps" },
-      { name: "Veggie Wrap", type: "Wraps" },
-      { name: "Chicken Wrap", type: "Wraps" },
-      { name: "Falafel Wrap", type: "Wraps" },
-
-      { name: "Pancakes", type: "Breakfast" },
-      { name: "French Toast", type: "Breakfast" },
-      { name: "Apple Oatmeal", type: "Breakfast" },
-      { name: "Omelet", type: "Breakfast" },
-
-      { name: "Berry Parfait", type: "Desserts" },
-      { name: "Rice Pudding", type: "Desserts" },
-      { name: "Fruit Trifle", type: "Desserts" },
-      { name: "Chia Pudding", type: "Desserts" },
-
-      { name: "Fruit Smoothie", type: "Drinks" },
-      { name: "Berry Lemonade", type: "Drinks" },
-      { name: "Iced Tea", type: "Drinks" },
-      { name: "Hot Chocolate", type: "Drinks" },
-
-      { name: "Hummus Plate", type: "Snacks" },
-      { name: "Mango Salsa", type: "Snacks" },
-      { name: "Peanut Butter Bites", type: "Snacks" },
-      { name: "Trail Mix", type: "Snacks" },
-
-      { name: "Lentil Curry", type: "Curry" },
-      { name: "Chicken Curry", type: "Curry" },
-      { name: "Vegetable Curry", type: "Curry" },
-      { name: "Chickpea Curry", type: "Curry" },
-
-      { name: "Baked Potatoes", type: "Potatoes" },
-      { name: "Potato Wedges", type: "Potatoes" },
-      { name: "Mashed Potatoes", type: "Potatoes" },
-      { name: "Potato Hash", type: "Potatoes" },
-
-      { name: "Strawberry Cake", type: "Cakes" },
-      { name: "Chocolate Cake", type: "Cakes" },
-      { name: "Carrot Cake", type: "Cakes" },
-      { name: "Lemon Cake", type: "Cakes" },
-
-      { name: "Vegetable Stir Fry", type: "Stir Fry" },
-      { name: "Chicken Stir Fry", type: "Stir Fry" },
-      { name: "Beef Stir Fry", type: "Stir Fry" },
-      { name: "Tofu Stir Fry", type: "Stir Fry" },
-
-      { name: "Beef Burger", type: "Burgers" },
-      { name: "Chicken Burger", type: "Burgers" },
-      { name: "Veggie Burger", type: "Burgers" },
-      { name: "Bean Burger", type: "Burgers" },
-
-      { name: "Salmon Bowl", type: "Seafood" },
-      { name: "Shrimp Skillet", type: "Seafood" },
-      { name: "Tuna Rice Bowl", type: "Seafood" },
-      { name: "Fish Bake", type: "Seafood" },
-
-      { name: "Roast Chicken", type: "Chicken" },
-      { name: "Lemon Chicken", type: "Chicken" },
-      { name: "BBQ Chicken", type: "Chicken" },
-      { name: "Herb Chicken", type: "Chicken" },
-
-      { name: "Beef Stew", type: "Beef" },
-      { name: "Beef Skillet", type: "Beef" },
-      { name: "Roast Beef", type: "Beef" },
-      { name: "Beef Fajitas", type: "Beef" },
-
-      { name: "Chocolate Cookies", type: "Cookies" },
-      { name: "Oatmeal Cookies", type: "Cookies" },
-      { name: "Sugar Cookies", type: "Cookies" },
-      { name: "Peanut Butter Cookies", type: "Cookies" },
-
-      { name: "Banana Smoothie", type: "Smoothies" },
-      { name: "Mango Smoothie", type: "Smoothies" },
-      { name: "Green Smoothie", type: "Smoothies" },
-      { name: "Peach Smoothie", type: "Smoothies" }
-    ];
-
-    const flavorTwists = [
-      {
-        name: "Classic",
-        ingredient: "a pinch of salt",
-        step: "Taste and add salt if needed."
-      },
-      {
-        name: "Lemon Herb",
-        ingredient: "1 tablespoon lemon juice and fresh herbs",
-        step: "Finish with lemon juice and fresh herbs."
-      },
-      {
-        name: "Spicy",
-        ingredient: "1/2 teaspoon chili flakes",
-        step: "Add chili flakes for a spicy flavor."
-      },
-      {
-        name: "Cheesy",
-        ingredient: "1/2 cup extra shredded cheese",
-        step: "Add the extra cheese before serving."
-      },
-      {
-        name: "Smoky",
-        ingredient: "1 teaspoon smoked paprika",
-        step: "Stir in smoked paprika for a smoky flavor."
-      },
-      {
-        name: "Garlic Herb",
-        ingredient: "2 extra garlic cloves and fresh parsley",
-        step: "Add garlic and parsley near the end."
-      },
-      {
-        name: "Honey Glazed",
-        ingredient: "1 tablespoon honey",
-        step: "Drizzle honey over the finished recipe."
-      },
-      {
-        name: "Creamy",
-        ingredient: "1/3 cup cooking cream",
-        step: "Stir in the cream until smooth."
-      },
-      {
-        name: "Crunchy",
-        ingredient: "1/2 cup toasted breadcrumbs",
-        step: "Add toasted breadcrumbs before serving."
-      },
-      {
-        name: "Fresh Garden",
-        ingredient: "1/2 cup chopped fresh vegetables",
-        step: "Add the fresh vegetables just before serving."
-      }
-    ];
-
-    /*
-      10 version families x 10 version qualities = 100 versions.
-    */
-
-    const versionFamilies = [
-      "Family Style",
-      "Quick",
-      "Light",
-      "Protein Plus",
-      "Garden",
-      "Weekend",
-      "Budget",
-      "Lunchbox",
-      "Party",
-      "Holiday"
-    ];
-
-    const versionQualities = [
-      "Home",
-      "Fresh",
-      "Simple",
-      "Deluxe",
-      "Healthy",
-      "Golden",
-      "Classic",
-      "Special",
-      "Favorite",
-      "Everyday"
-    ];
-
-    const recipeVersions = [];
-
-    versionFamilies.forEach(function(family, familyIndex) {
-      versionQualities.forEach(function(quality, qualityIndex) {
-        recipeVersions.push({
-          name: quality + " " + family,
-          ingredient:
-            "one extra ingredient for the " +
-            quality.toLowerCase() +
-            " " +
-            family.toLowerCase() +
-            " version",
-          step:
-            "Finish and serve the " +
-            quality.toLowerCase() +
-            " " +
-            family.toLowerCase() +
-            " version.",
-          extraTime: familyIndex + qualityIndex
-        });
+      recipes.push({
+        id:id,
+        name:twist.name+" "+version.name+" "+base.name,
+        type:base.type,
+        category:info.category,
+        emoji:info.emoji,
+        time:info.time+twistIndex+version.extraTime,
+        servings:info.servings,
+        difficulty:info.difficulty,
+        ingredients:info.ingredients.concat([twist.ingredient,version.ingredient]),
+        steps:info.steps.concat([twist.step,version.step])
       });
     });
+  });
+});
 
-    const recipes = [];
+console.log("Total recipes:",recipes.length);
 
-    baseRecipes.forEach(function(base, baseIndex) {
-      const typeInfo = recipeTypeInfo[base.type];
+const recipeGrid=document.getElementById("recipeGrid");
+const searchInput=document.getElementById("searchInput");
+const categoryFilter=document.getElementById("categoryFilter");
+const typeFilter=document.getElementById("typeFilter");
+const difficultyFilter=document.getElementById("difficultyFilter");
+const sortSelect=document.getElementById("sortSelect");
+const recipeCount=document.getElementById("recipeCount");
+const loadMoreButton=document.getElementById("loadMoreButton");
+const noResults=document.getElementById("noResults");
+const modalBackground=document.getElementById("modalBackground");
+const modalContent=document.getElementById("modalContent");
+const closeButton=document.getElementById("closeButton");
+const themeToggle=document.getElementById("themeToggle");
 
-      flavorTwists.forEach(function(twist, twistIndex) {
-        recipeVersions.forEach(function(version, versionIndex) {
-          const recipeNumber =
-            baseIndex * 1000 +
-            twistIndex * 100 +
-            versionIndex +
-            1;
+let visibleRecipeLimit=120;
+let currentFilteredRecipes=[];
 
-          recipes.push({
-            id: recipeNumber,
-            name:
-              twist.name +
-              " " +
-              version.name +
-              " " +
-              base.name,
-            type: base.type,
-            category: typeInfo.category,
-            emoji: typeInfo.emoji,
-            time:
-              typeInfo.time +
-              twistIndex +
-              version.extraTime,
-            servings: typeInfo.servings,
-            difficulty: typeInfo.difficulty,
-            ingredients: typeInfo.ingredients.concat([
-              twist.ingredient,
-              version.ingredient
-            ]),
-            steps: typeInfo.steps.concat([
-              twist.step,
-              version.step
-            ])
-          });
-        });
-      });
-    });
+/* LIGHT AND DARK MODE */
 
-    console.log("Total recipes:", recipes.length);
+function applyTheme(theme){
+  document.body.classList.toggle("dark-mode",theme==="dark");
+  themeToggle.textContent=theme==="dark"?"☀️ Light Mode":"🌙 Dark Mode";
+  localStorage.setItem("recipeFinderTheme",theme);
+}
 
-    const recipeGrid =
-      document.getElementById("recipeGrid");
+const savedTheme=localStorage.getItem("recipeFinderTheme")||"light";
+applyTheme(savedTheme);
 
-    const searchInput =
-      document.getElementById("searchInput");
+themeToggle.addEventListener("click",function(){
+  const newTheme=document.body.classList.contains("dark-mode")?"light":"dark";
+  applyTheme(newTheme);
+});
 
-    const categoryFilter =
-      document.getElementById("categoryFilter");
+/* HTML SAFETY */
 
-    const typeFilter =
-      document.getElementById("typeFilter");
+function escapeHTML(value){
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
-    const sortSelect =
-      document.getElementById("sortSelect");
+/* FILTER AND SORT RECIPES */
 
-    const recipeCount =
-      document.getElementById("recipeCount");
+function getFilteredRecipes(){
+  const searchText=searchInput.value.trim().toLowerCase();
+  const selectedCategory=categoryFilter.value;
+  const selectedType=typeFilter.value;
+  const selectedDifficulty=difficultyFilter.value;
+  const selectedSort=sortSelect.value;
 
-    const loadMoreButton =
-      document.getElementById("loadMoreButton");
+  let filtered=recipes.filter(function(recipe){
+    const searchableText=[
+      recipe.name,
+      recipe.type,
+      recipe.category,
+      recipe.ingredients.join(" "),
+      recipe.steps.join(" ")
+    ].join(" ").toLowerCase();
 
-    const noResults =
-      document.getElementById("noResults");
+    const matchesSearch=searchableText.includes(searchText);
+    const matchesCategory=selectedCategory==="All"||recipe.category===selectedCategory;
+    const matchesType=selectedType==="All"||recipe.type===selectedType;
+    const matchesDifficulty=selectedDifficulty==="All"||recipe.difficulty===selectedDifficulty;
 
-    const modalBackground =
-      document.getElementById("modalBackground");
+    return matchesSearch&&matchesCategory&&matchesType&&matchesDifficulty;
+  });
 
-    const modalContent =
-      document.getElementById("modalContent");
+  filtered.sort(function(a,b){
+    if(selectedSort==="time")return a.time-b.time;
 
-    const closeButton =
-      document.getElementById("closeButton");
-
-    let visibleRecipeLimit = 120;
-    let currentFilteredRecipes = [];
-
-    function escapeHTML(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    if(selectedSort==="difficulty"){
+      const order={Easy:1,Medium:2,Hard:3};
+      return order[a.difficulty]-order[b.difficulty];
     }
 
-    function getFilteredRecipes() {
-      const searchText =
-        searchInput.value.trim().toLowerCase();
+    return a.name.localeCompare(b.name);
+  });
 
-      const selectedCategory =
-        categoryFilter.value;
+  return filtered;
+}
 
-      const selectedType =
-        typeFilter.value;
+/* DISPLAY RECIPE CARDS */
 
-      const selectedSort =
-        sortSelect.value;
+function displayRecipes(){
+  currentFilteredRecipes=getFilteredRecipes();
+  recipeGrid.innerHTML="";
 
-      let filteredRecipes = recipes.filter(function(recipe) {
-        const searchableText = [
-          recipe.name,
-          recipe.type,
-          recipe.category,
-          recipe.ingredients.join(" "),
-          recipe.steps.join(" ")
-        ]
-          .join(" ")
-          .toLowerCase();
+  recipeCount.textContent=
+    "Showing "+Math.min(visibleRecipeLimit,currentFilteredRecipes.length)+
+    " of "+currentFilteredRecipes.length+
+    " matching recipes out of "+recipes.length+" total recipes";
 
-        const matchesSearch =
-          searchableText.includes(searchText);
+  if(currentFilteredRecipes.length===0){
+    noResults.style.display="block";
+    loadMoreButton.style.display="none";
+    return;
+  }
 
-        const matchesCategory =
-          selectedCategory === "All" ||
-          recipe.category === selectedCategory;
+  noResults.style.display="none";
 
-        const matchesType =
-          selectedType === "All" ||
-          recipe.type === selectedType;
+  const recipesToDisplay=currentFilteredRecipes.slice(0,visibleRecipeLimit);
 
-        return (
-          matchesSearch &&
-          matchesCategory &&
-          matchesType
-        );
-      });
+  recipesToDisplay.forEach(function(recipe){
+    const card=document.createElement("article");
+    card.className="recipe-card";
 
-      filteredRecipes.sort(function(a, b) {
-        if (selectedSort === "time") {
-          return a.time - b.time;
-        }
-
-        if (selectedSort === "difficulty") {
-          const difficultyOrder = {
-            Easy: 1,
-            Medium: 2,
-            Hard: 3
-          };
-
-          return (
-            difficultyOrder[a.difficulty] -
-            difficultyOrder[b.difficulty]
-          );
-        }
-
-        return a.name.localeCompare(b.name);
-      });
-
-      return filteredRecipes;
-    }
-
-    function displayRecipes() {
-      currentFilteredRecipes =
-        getFilteredRecipes();
-
-      recipeGrid.innerHTML = "";
-
-      recipeCount.textContent =
-        "Showing " +
-        Math.min(
-          visibleRecipeLimit,
-          currentFilteredRecipes.length
-        ) +
-        " of " +
-        currentFilteredRecipes.length +
-        " matching recipes out of " +
-        recipes.length +
-        " total recipes";
-
-      if (currentFilteredRecipes.length === 0) {
-        noResults.style.display = "block";
-        loadMoreButton.style.display = "none";
-        return;
-      }
-
-      noResults.style.display = "none";
-
-      const recipesToDisplay =
-        currentFilteredRecipes.slice(
-          0,
-          visibleRecipeLimit
-        );
-
-      recipesToDisplay.forEach(function(recipe) {
-        const card =
-          document.createElement("article");
-
-        card.className = "recipe-card";
-
-        card.innerHTML = `
-          <div class="recipe-image">
-            ${escapeHTML(recipe.emoji)}
-          </div>
-
-          <div class="recipe-content">
-            <div class="badges">
-              <span class="badge">
-                ${escapeHTML(recipe.category)}
-              </span>
-
-              <span class="badge">
-                ${escapeHTML(recipe.type)}
-              </span>
-            </div>
-
-            <h2>
-              ${escapeHTML(recipe.name)}
-            </h2>
-
-            <div class="details">
-              ⏱ ${escapeHTML(recipe.time)} minutes<br>
-              👥 Serves ${escapeHTML(recipe.servings)}<br>
-              ⭐ ${escapeHTML(recipe.difficulty)}<br>
-              🔢 Recipe #${escapeHTML(recipe.id)}
-            </div>
-
-            <button
-              class="view-button"
-              data-id="${escapeHTML(recipe.id)}"
-            >
-              View Recipe
-            </button>
-          </div>
-        `;
-
-        recipeGrid.appendChild(card);
-      });
-
-      if (
-        visibleRecipeLimit <
-        currentFilteredRecipes.length
-      ) {
-        loadMoreButton.style.display = "block";
-      } else {
-        loadMoreButton.style.display = "none";
-      }
-
-      const buttons =
-        document.querySelectorAll(".view-button");
-
-      buttons.forEach(function(button) {
-        button.addEventListener("click", function() {
-          openRecipe(Number(button.dataset.id));
-        });
-      });
-    }
-
-    function openRecipe(recipeId) {
-      const recipe = recipes.find(function(item) {
-        return item.id === recipeId;
-      });
-
-      if (!recipe) {
-        return;
-      }
-
-      const ingredientList =
-        recipe.ingredients
-          .map(function(ingredient) {
-            return (
-              "<li>" +
-              escapeHTML(ingredient) +
-              "</li>"
-            );
-          })
-          .join("");
-
-      const stepList =
-        recipe.steps
-          .map(function(step, index) {
-            return `
-              <li>
-                <strong>Step ${index + 1}:</strong>
-                ${escapeHTML(step)}
-              </li>
-            `;
-          })
-          .join("");
-
-      modalContent.innerHTML = `
-        <h2>
-          ${escapeHTML(recipe.emoji)}
-          ${escapeHTML(recipe.name)}
-        </h2>
-
-        <div class="modal-info">
-          <strong>Recipe number:</strong>
-          ${escapeHTML(recipe.id)}
-          <br>
-
-          <strong>Type:</strong>
-          ${escapeHTML(recipe.type)}
-          <br>
-
-          <strong>Category:</strong>
-          ${escapeHTML(recipe.category)}
-          <br>
-
-          <strong>Cooking time:</strong>
-          ${escapeHTML(recipe.time)} minutes
-          <br>
-
-          <strong>Servings:</strong>
-          ${escapeHTML(recipe.servings)}
-          <br>
-
-          <strong>Difficulty:</strong>
-          ${escapeHTML(recipe.difficulty)}
+    card.innerHTML=`
+      <div class="recipe-image">${escapeHTML(recipe.emoji)}</div>
+      <div class="recipe-content">
+        <div class="badges">
+          <span class="badge">${escapeHTML(recipe.category)}</span>
+          <span class="badge">${escapeHTML(recipe.type)}</span>
+          <span class="badge">${escapeHTML(recipe.difficulty)}</span>
         </div>
+        <h2>${escapeHTML(recipe.name)}</h2>
+        <div class="details">
+          ⏱ ${escapeHTML(recipe.time)} minutes<br>
+          👥 Serves ${escapeHTML(recipe.servings)}<br>
+          ⭐ ${escapeHTML(recipe.difficulty)}<br>
+          🔢 Recipe #${escapeHTML(recipe.id)}
+        </div>
+        <button class="view-button" data-id="${escapeHTML(recipe.id)}">
+          View Recipe
+        </button>
+      </div>
+    `;
 
-        <h3>Ingredients</h3>
+    recipeGrid.appendChild(card);
+  });
 
-        <ul>
-          ${ingredientList}
-        </ul>
+  loadMoreButton.style.display=
+    visibleRecipeLimit<currentFilteredRecipes.length?"block":"none";
 
-        <h3>Instructions</h3>
+  document.querySelectorAll(".view-button").forEach(function(button){
+    button.addEventListener("click",function(){
+      openRecipe(Number(button.dataset.id));
+    });
+  });
+}
 
-        <ol>
-          ${stepList}
-        </ol>
-      `;
+/* OPEN RECIPE DETAILS */
 
-      modalBackground.style.display = "flex";
-    }
+function openRecipe(recipeId){
+  const recipe=recipes.find(function(item){return item.id===recipeId;});
+  if(!recipe)return;
 
-    function closeRecipe() {
-      modalBackground.style.display = "none";
-    }
+  const ingredientList=recipe.ingredients.map(function(ingredient){
+    return "<li>"+escapeHTML(ingredient)+"</li>";
+  }).join("");
 
-    function resetVisibleLimit() {
-      visibleRecipeLimit = 120;
-      displayRecipes();
-    }
+  const stepList=recipe.steps.map(function(step,index){
+    return "<li><strong>Step "+(index+1)+":</strong> "+escapeHTML(step)+"</li>";
+  }).join("");
 
-    searchInput.addEventListener(
-      "input",
-      resetVisibleLimit
-    );
+  modalContent.innerHTML=`
+    <h2>${escapeHTML(recipe.emoji)} ${escapeHTML(recipe.name)}</h2>
 
-    categoryFilter.addEventListener(
-      "change",
-      resetVisibleLimit
-    );
+    <div class="modal-info">
+      <strong>Recipe number:</strong> ${escapeHTML(recipe.id)}<br>
+      <strong>Type:</strong> ${escapeHTML(recipe.type)}<br>
+      <strong>Category:</strong> ${escapeHTML(recipe.category)}<br>
+      <strong>Cooking time:</strong> ${escapeHTML(recipe.time)} minutes<br>
+      <strong>Servings:</strong> ${escapeHTML(recipe.servings)}<br>
+      <strong>Difficulty:</strong> ${escapeHTML(recipe.difficulty)}
+    </div>
 
-    typeFilter.addEventListener(
-      "change",
-      resetVisibleLimit
-    );
+    <h3>Ingredients</h3>
+    <ul>${ingredientList}</ul>
 
-    sortSelect.addEventListener(
-      "change",
-      resetVisibleLimit
-    );
+    <h3>Instructions</h3>
+    <ol>${stepList}</ol>
+  `;
 
-    loadMoreButton.addEventListener(
-      "click",
-      function() {
-        visibleRecipeLimit += 120;
-        displayRecipes();
-      }
-    );
+  modalBackground.style.display="flex";
+}
 
-    closeButton.addEventListener(
-      "click",
-      closeRecipe
-    );
+function closeRecipe(){
+  modalBackground.style.display="none";
+}
 
-    modalBackground.addEventListener(
-      "click",
-      function(event) {
-        if (event.target === modalBackground) {
-          closeRecipe();
-        }
-      }
-    );
+function resetVisibleLimit(){
+  visibleRecipeLimit=120;
+  displayRecipes();
+}
 
-    document.addEventListener(
-      "keydown",
-      function(event) {
-        if (event.key === "Escape") {
-          closeRecipe();
-        }
-      }
-    );
+/* EVENT LISTENERS */
 
-    displayRecipes();
-  </script>
+searchInput.addEventListener("input",resetVisibleLimit);
+categoryFilter.addEventListener("change",resetVisibleLimit);
+typeFilter.addEventListener("change",resetVisibleLimit);
+difficultyFilter.addEventListener("change",resetVisibleLimit);
+sortSelect.addEventListener("change",resetVisibleLimit);
+
+loadMoreButton.addEventListener("click",function(){
+  visibleRecipeLimit+=120;
+  displayRecipes();
+});
+
+closeButton.addEventListener("click",closeRecipe);
+
+modalBackground.addEventListener("click",function(event){
+  if(event.target===modalBackground)closeRecipe();
+});
+
+document.addEventListener("keydown",function(event){
+  if(event.key==="Escape")closeRecipe();
+});
+
+/* START WEBSITE */
+
+displayRecipes();
+</script>
 
 </body>
 </html>
